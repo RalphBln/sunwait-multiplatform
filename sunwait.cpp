@@ -688,7 +688,7 @@ int wait (targetStruct *pTarget)
 
   // This is it - wait until event occurs and then exit normally
   //Sleep (interval); // Windows
-  sleep (interval);    // Linux
+  sleep (interval/1000);    // Linux sleep accepts seconds
 
   return EXIT_OK;
 }
