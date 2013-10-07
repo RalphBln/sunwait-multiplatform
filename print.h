@@ -1,3 +1,4 @@
+#include "sunwait.h"
 
 void generate_report (targetStruct *pTarget);
 

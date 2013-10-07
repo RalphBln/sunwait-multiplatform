@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>   // Windows
 #include <iostream>
 #include <time.h>
 #include <cstring>
@@ -387,18 +386,18 @@ int main(int argc, char *argv[])
     struct tm tmNow;
 
     /* Windows code: Start */
-    errno_t err;
-    __int64 ltime;
-    time (&ltime);
-    err = _gmtime64_s (&tmNow, &ltime);
-    if (err) { printf ("Error: Invalid Argument to _gmtime64_s."); }
+    //errno_t err;
+    //__int64 ltime;
+    //time (&ltime);
+    //err = _gmtime64_s (&tmNow, &ltime);
+    //if (err) { printf ("Error: Invalid Argument to _gmtime64_s."); }
     /* Windows code: End */
 
     ///* Linux code: Start */
-    //time_t tt;
-    //tt = time (NULL);
-    //ctime (&tt);
-    //gmtime_r (&tt, &tmNow);
+    time_t tt;
+    tt = time (NULL);
+    ctime (&tt);
+    gmtime_r (&tt, &tmNow);
     ///* Linux code: End */
 
     gTarget.nowTime        = tmNow.tm_hour + tmNow.tm_min/60.0 + tmNow.tm_sec/3600;
@@ -688,8 +687,8 @@ int wait (targetStruct *pTarget)
   }
 
   // This is it - wait until event occurs and then exit normally
-  Sleep (interval); // Windows
-  // sleep (interval);    // Linux
+  //Sleep (interval); // Windows
+  sleep (interval);    // Linux
 
   return EXIT_OK;
 }

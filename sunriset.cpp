@@ -80,7 +80,7 @@ void sunriset (targetStruct *pTarget)
   /* compute the diurnal arc that the sun traverses to reach the specified altitide altit: */
   double cost = (sind(altit) - sind(pTarget->latitude) * sind(sdec)) / (cosd(pTarget->latitude) * cosd(sdec));
 
-  if (abs(cost) < 1.0)
+  if (fabs(cost) < 1.0)
   { pTarget->dayType = DAYTYPE_NORMAL; 
     t = acosd(cost)/15.0;    /* the diurnal arc, hours */
 

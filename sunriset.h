@@ -1,3 +1,4 @@
+#include "sunwait.h"
 /* Sunrise/set is considered to occur when the Sun's upper limb (upper edge) is 50 arc minutes below the horizon */
 /* (this accounts for the refraction of the Earth's atmosphere). */
 /* Civil twilight starts/ends when the Sun's center is 6 degrees below the horizon. */
@@ -25,7 +26,7 @@
  #define PI 3.1415926535897932384
 #endif
 
-void sunriset (targetStruct *pTarget);
+void sunriset (targetStruct* pTarget);
 double revolution (double x);
 double rev180 (double x);
 double GMST0 (double d);
