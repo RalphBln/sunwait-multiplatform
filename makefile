@@ -1,7 +1,7 @@
 C=gcc
 CFLAGS=-c -Wall 
 LDFLAGS= -lm -lstdc++
-SOURCES=sunwait.cpp sunriset.cpp print.cpp sunwait.h sunriset.h print.h
+SOURCES=sunwait.cpp sunriset.cpp print.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sunwait
 

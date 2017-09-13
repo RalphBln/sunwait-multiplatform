@@ -10,6 +10,8 @@
 #include "sunwait.h"
 #include "sunriset.h"
 #include "print.h"
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -19,10 +21,10 @@ using namespace std;
 /* Licensed under the Gnu General Public License */
 
 // Sunset is the instant at which the upper edge of the Sun disappears below the horizon (in the west).
-// Civil twilight is the period from sunset until the geometric center of the sun is 6° below the horizon.
-// Nautical twilight is the period when the geometric center of the sun is between 6° and 12° below the horizon.
-// Astronomical twilight is the period when the geometric center of the sun is between 12° and 18° below the horizon.
-// Night is period when the geometric center of the sun falls 18° below the horizon.
+// Civil twilight is the period from sunset until the geometric center of the sun is 6Â° below the horizon.
+// Nautical twilight is the period when the geometric center of the sun is between 6Â° and 12Â° below the horizon.
+// Astronomical twilight is the period when the geometric center of the sun is between 12Â° and 18Â° below the horizon.
+// Night is period when the geometric center of the sun falls 18Â° below the horizon.
 
 
 /*
@@ -31,7 +33,7 @@ using namespace std;
 ** Functions can use a single parameter rather than have long parameter lists or less honest side-effects.
 ** It makes pointers or values in argument issues disappear.
 ** It forces functions to name the parameter they're accessing, rather than parameter position in argument.
-** Data types are easier to handle. 
+** Data types are easier to handle.
 ** It can be a bit naughty on side-effects.
 */
 targetStruct gTarget;
@@ -43,7 +45,7 @@ void print_version ()
 }
 
 /* It's just too useful to have this here */
-void print_usage () 
+void print_usage ()
 { printf ("Usage: sunwait [major options] [minor options] [twilight types] [rise|set] [+/-offset] [latitude longitude]\n");
   printf ("\n");
   printf ("Example1: sunwait wait daylight rise -1:15:10 51.477932N 0.000000E\n");
@@ -116,7 +118,7 @@ void myToLower (char *arg)
 
 void myToLower (int argc, char *argv[])
 { for (int i=1; i < argc; i++)
-    myToLower (argv [i]); 
+    myToLower (argv [i]);
 }
 
 boolean myIsNumber (char* arg)
@@ -339,14 +341,14 @@ boolean isOffset (targetStruct *pTarget, char* pArg)
   return false; /* Shouldn't get here */
 }
 
-double getOffsetRiseTime (targetStruct *pTarget) 
+double getOffsetRiseTime (targetStruct *pTarget)
 { double offset = pTarget->riseTime + pTarget->hourOffset;
   if (offset <  0.00) return 0.0000;
   if (offset >= 12.0) return 11.999;
   return offset;
 }
 
-double getOffsetSetTime (targetStruct *pTarget) 
+double getOffsetSetTime (targetStruct *pTarget)
 { double offset = pTarget->setTime - pTarget->hourOffset;
   if (offset <  12.0) return 0.0000;
   if (offset >= 24.0) return 23.999;
@@ -382,7 +384,7 @@ int main(int argc, char *argv[])
   ** Get current time in GMT
   */
 
-  { 
+  {
     struct tm tmNow;
 
     /* Windows code: Start */
@@ -410,16 +412,16 @@ int main(int argc, char *argv[])
   }
 
   /*
-  ** Parse command line arguments 
+  ** Parse command line arguments
   */
 
   /* Change to all lowercase, just to make life easier ... */
-  myToLower (argc, argv); 
+  myToLower (argc, argv);
   /* Look for debug being activated ... */
   for (int i=1; i < argc; i++) if (!strcmp (argv [i], "-debug")) gTarget.debug = ONOFF_ON;
   /* For each argument */
   for (int i=1; i < argc; i++)
-  { 
+  {
     char *arg = argv[i];
 
     /* Echo argument, if in debug */
@@ -427,7 +429,7 @@ int main(int argc, char *argv[])
 
     /* Strip any hyphen from arguments, but not negative signs for numbers */
     if (arg[0]=='-' && arg[1] != '\0' && !isdigit(arg[1])) *arg++;
-    
+
          if   (!strcmp (arg, "v")             ||
                !strcmp (arg, "version"))      gTarget.function = FUNCTION_VERSION;
     else if   (!strcmp (arg, "nv")            ||
@@ -535,8 +537,8 @@ int main(int argc, char *argv[])
   ** Check: Latitude and Longitude
   */
 
-  if (gTarget.latitude == NOT_SET || gTarget.longitude == NOT_SET) 
-  { if (gTarget.debug == ONOFF_ON) printf ("Debug: latitude or longitude not set. Default applied.\n"); 
+  if (gTarget.latitude == NOT_SET || gTarget.longitude == NOT_SET)
+  { if (gTarget.debug == ONOFF_ON) printf ("Debug: latitude or longitude not set. Default applied.\n");
     gTarget.latitude  = 52.952308;
     gTarget.longitude = 359.048052; /* The Buttercross, Bingham, England */
   }
@@ -551,7 +553,7 @@ int main(int argc, char *argv[])
   }
 
   /*
-  ** Check: Twilight Angle 
+  ** Check: Twilight Angle
   */
 
   if (gTarget.twilightAngle == NOT_SET)
@@ -596,8 +598,8 @@ int main(int argc, char *argv[])
   }
 
   /*
-  ** Calculate start/end of twilight for given twilight type. 
-  ** For latitudes near poles, the sun might not pass through specified twilight angle that day. 
+  ** Calculate start/end of twilight for given twilight type.
+  ** For latitudes near poles, the sun might not pass through specified twilight angle that day.
   */
 
   sunriset (&gTarget);
@@ -606,23 +608,23 @@ int main(int argc, char *argv[])
   if (gTarget.report == ONOFF_ON) generate_report (&gTarget);
 
   // Anything decided on now?
-  if (gTarget.function == FUNCTION_VERSION) 
-  { print_version (); 
-    exitCode = EXIT_OK; 
+  if (gTarget.function == FUNCTION_VERSION)
+  { print_version ();
+    exitCode = EXIT_OK;
   }
-  else if (gTarget.function == FUNCTION_USAGE) 
-  { print_usage (); 
-    exitCode = EXIT_OK; 
+  else if (gTarget.function == FUNCTION_USAGE)
+  { print_usage ();
+    exitCode = EXIT_OK;
   }
-  else if (gTarget.function == FUNCTION_LIST)  
-  { print_list (&gTarget);  
-    exitCode = EXIT_OK; 
+  else if (gTarget.function == FUNCTION_LIST)
+  { print_list (&gTarget);
+    exitCode = EXIT_OK;
   }
   else if (gTarget.function == FUNCTION_WAIT)
-  { exitCode = wait (&gTarget); 
+  { exitCode = wait (&gTarget);
   }
-  else if (gTarget.function == FUNCTION_POLL)  
-  { exitCode = poll (&gTarget); 
+  else if (gTarget.function == FUNCTION_POLL)
+  { exitCode = poll (&gTarget);
   }
 
   if (gTarget.exitReport == ONOFF_ON)
@@ -643,7 +645,7 @@ int poll (targetStruct *pTarget)
   if (pTarget->dayType == DAYTYPE_POLAR_DAY)    return EXIT_DAY;
   if (pTarget->dayType == DAYTYPE_POLAR_NIGHT ) return EXIT_NIGHT;
 
-  if 
+  if
   (  pTarget->nowTime >= getOffsetRiseTime (pTarget)
   && pTarget->nowTime <  getOffsetSetTime  (pTarget)
   ) return EXIT_DAY;
@@ -661,13 +663,13 @@ int wait (targetStruct *pTarget)
   double  nowTime = pTarget->nowTime;
   double riseTime = getOffsetRiseTime (pTarget);
   double  setTime = getOffsetSetTime  (pTarget);
-  double interval = (pTarget->upDown == UPDOWN_SUNRISE) ?  riseTime - nowTime : setTime - nowTime;
+  long interval = (pTarget->upDown == UPDOWN_SUNRISE) ?  riseTime - nowTime : setTime - nowTime;
 
   // Add days
   interval += days * 24;
 
   // Don't wait if event has passed
-  if (interval < 0) 
+  if (interval < 0)
   { interval = 0;
     if (pTarget->debug == ONOFF_ON) printf ("Debug: Event already passed today.\n");
     return EXIT_ERROR;
@@ -676,19 +678,20 @@ int wait (targetStruct *pTarget)
   // In debug mode, we don't want to wait for sunrise or sunset. Wait a minute instead.
   if (pTarget->debug == ONOFF_ON)
   {
-    printf("Debug: Debug mode, \"wait\" reduced from %f hours to 1 minute.\n", interval);
+    printf("Debug: Debug mode, \"wait\" reduced from %lu hours to 1 minute.\n", interval);
     interval = (60 * 1000);
   }
   else
   {
-    printf("Debug: Wait (seconds): %f\n", interval);
+    printf("Debug: Wait (seconds): %lu\n", interval);
     // Convert hours to milliseconds
     interval *= 60 * 60 * 1000;
   }
 
   // This is it - wait until event occurs and then exit normally
   //Sleep (interval); // Windows
-  sleep (interval/1000);    // Linux sleep accepts seconds
+  //  sleep (interval/1000);    // Linux sleep accepts seconds
+  std::this_thread::sleep_for(std::chrono::milliseconds(interval)); // this should work on all platforms
 
   return EXIT_OK;
 }
